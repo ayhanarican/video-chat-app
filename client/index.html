@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WebRTC Video Chat - Pro</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div id="login-screen" class="screen active">
+        <div class="login-container">
+            <h1>📹 WebRTC Video Chat</h1>
+            <p>Görüntülü konuşma ve ekran paylaşımı</p>
+            
+            <div class="avatar-selector">
+                <p>Avatar secin:</p>
+                <div class="avatar-grid" id="avatar-grid">
+                    <div class="avatar-option selected" data-avatar="👤">👤</div>
+                    <div class="avatar-option" data-avatar="😀">😀</div>
+                    <div class="avatar-option" data-avatar="😎">😎</div>
+                    <div class="avatar-option" data-avatar="🤓">🤓</div>
+                    <div class="avatar-option" data-avatar="😺">😺</div>
+                    <div class="avatar-option" data-avatar="🐶">🐶</div>
+                    <div class="avatar-option" data-avatar="🦊">🦊</div>
+                    <div class="avatar-option" data-avatar="🐼">🐼</div>
+                </div>
+            </div>
+            
+            <input type="text" id="user-name" placeholder="İsminiz" maxlength="20">
+            <input type="text" id="room-id" placeholder="Oda ID (boş bırakın, otomatik oluşur)">
+            <button id="join-btn" class="primary-btn">Odaya Katıl</button>
+            <div class="info">
+                <small>💡 Maksimum 50 kişi aynı odada olabilir</small>
+            </div>
+        </div>
+    </div>
+
+    <div id="chat-screen" class="screen">
+        <div class="main-container">
+            <div class="video-container">
+                <div id="screen-share-container" class="screen-share">
+                    <video id="screen-video" autoplay playsinline></video>
+                    <div class="no-screen">
+                        <div class="placeholder">
+                            🖥️
+                            <p>Ekran paylaşımı yok</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="camera-grid" class="camera-grid">
+                    <div class="video-box local" id="local-video-box">
+                        <video id="local-video" autoplay muted playsinline></video>
+                        <div class="video-label">
+                            <span id="local-avatar">👤</span> Siz
+                        </div>
+                        <div class="video-controls">
+                            <button id="toggle-camera" class="control-btn active" title="Kamera">📹</button>
+                            <button id="toggle-mic" class="control-btn active" title="Mikrofon">🎤</button>
+                        </div>
+                        <div class="audio-level-indicator">
+                            <div class="audio-level-bar" id="local-audio-bar"></div>
+                        </div>
+                        <div class="hand-raised-icon hidden" id="local-hand-icon">✋</div>
+                    </div>
+                </div>
+
+                <div id="reactions-container" class="reactions-container"></div>
+
+                <div class="bottom-controls">
+                    <button id="record-screen-btn" class="control-btn" title="Ekran Kaydı">🔴</button>
+                    <button id="stop-record-btn" class="control-btn hidden" title="Kaydı Durdur">⏺️</button>
+                    <button id="send-file-btn" class="control-btn" title="Dosya Gönder">📎</button>
+                    <input type="file" id="file-input" style="display:none">
+                    <button id="raise-hand-btn" class="control-btn" title="El Kaldir">✋</button>
+                    <button id="reaction-btn" class="control-btn" title="Reaksiyon">😊</button>
+                    <button id="share-screen-btn" class="control-btn">🖥️</button>
+                    <button id="stop-screen-btn" class="control-btn hidden">⏹️</button>
+                    <button id="leave-btn" class="control-btn danger">📞</button>
+                </div>
+
+                <div class="room-info">
+                    <span id="room-name">Oda: </span>
+                    <span id="user-count">👥 1</span>
+                    <span id="connection-quality" class="connection-quality">
+                        📶 <span id="quality-text">İyi</span>
+                    </span>
+                </div>
+
+                <button id="chat-toggle-btn" class="chat-toggle-btn">
+                    💬
+                    <span class="unread-badge hidden" id="unread-badge">0</span>
+                </button>
+
+                <div id="reaction-picker" class="reaction-picker hidden">
+                    <div class="reaction-item" data-reaction="👍">👍</div>
+                    <div class="reaction-item" data-reaction="❤️">❤️</div>
+                    <div class="reaction-item" data-reaction="😂">😂</div>
+                    <div class="reaction-item" data-reaction="😮">😮</div>
+                    <div class="reaction-item" data-reaction="🎉">🎉</div>
+                    <div class="reaction-item" data-reaction="👏">👏</div>
+                </div>
+
+                <div id="bg-effect-menu" class="bg-effect-menu hidden">
+                    <div class="bg-option" data-effect="none">❌ Yok</div>
+                    <div class="bg-option" data-effect="blur">🌫️ Blur</div>
+                    <div class="bg-option" data-effect="dark">🌙 Karanlık</div>
+                    <div class="bg-option" data-effect="light">☀️ Aydınlık</div>
+                    <div class="bg-option" data-effect="grayscale">⬜ Siyah-Beyaz</div>
+                </div>
+            </div>
+
+            <div class="chat-sidebar" id="chat-sidebar">
+                <div class="chat-header">
+                    <h3>💬 Sohbet</h3>
+                    <div class="chat-tools">
+                        <button id="save-chat-btn" class="tool-btn" title="Chat Geçmişini Kaydet">💾</button>
+                        <button id="clear-chat-btn" class="tool-btn" title="Chat Temizle">🗑️</button>
+                        <button id="bg-effect-btn" class="tool-btn" title="Arka Plan Efekti">🎨</button>
+                    </div>
+                    <button id="close-chat-btn" class="close-chat-btn">✕</button>
+                </div>
+                <div id="chat-messages" class="chat-messages"></div>
+                <div class="chat-input-container">
+                    <button id="emoji-btn" class="emoji-btn" title="Emoji">😊</button>
+                    <input type="text" id="chat-input" placeholder="Mesajınızı yazın..." maxlength="500">
+                    <button id="send-message-btn">Gönder</button>
+                </div>
+                
+                <div id="emoji-picker" class="emoji-picker hidden">
+                    <div class="emoji-grid">
+                        <span class="emoji-item">😀</span><span class="emoji-item">😃</span>
+                        <span class="emoji-item">😄</span><span class="emoji-item">😁</span>
+                        <span class="emoji-item">😅</span><span class="emoji-item">😂</span>
+                        <span class="emoji-item">🤣</span><span class="emoji-item">😊</span>
+                        <span class="emoji-item">😇</span><span class="emoji-item">🙂</span>
+                        <span class="emoji-item">😉</span><span class="emoji-item">😌</span>
+                        <span class="emoji-item">😍</span><span class="emoji-item">🥰</span>
+                        <span class="emoji-item">😘</span><span class="emoji-item">😗</span>
+                        <span class="emoji-item">😙</span><span class="emoji-item">😚</span>
+                        <span class="emoji-item">😋</span><span class="emoji-item">😛</span>
+                        <span class="emoji-item">😝</span><span class="emoji-item">😜</span>
+                        <span class="emoji-item">🤪</span><span class="emoji-item">🤨</span>
+                        <span class="emoji-item">🧐</span><span class="emoji-item">🤓</span>
+                        <span class="emoji-item">😎</span><span class="emoji-item">🤩</span>
+                        <span class="emoji-item">🥳</span><span class="emoji-item">😏</span>
+                        <span class="emoji-item">😒</span><span class="emoji-item">😞</span>
+                        <span class="emoji-item">😔</span><span class="emoji-item">😟</span>
+                        <span class="emoji-item">😕</span><span class="emoji-item">🙁</span>
+                        <span class="emoji-item">☹️</span><span class="emoji-item">😣</span>
+                        <span class="emoji-item">😖</span><span class="emoji-item">😫</span>
+                        <span class="emoji-item">😩</span><span class="emoji-item">🥺</span>
+                        <span class="emoji-item">😢</span><span class="emoji-item">😭</span>
+                        <span class="emoji-item">😤</span><span class="emoji-item">😠</span>
+                        <span class="emoji-item">😡</span><span class="emoji-item">🤬</span>
+                        <span class="emoji-item">🤯</span><span class="emoji-item">😳</span>
+                        <span class="emoji-item">🥵</span><span class="emoji-item">🥶</span>
+                        <span class="emoji-item">😱</span><span class="emoji-item">😨</span>
+                        <span class="emoji-item">🎉</span><span class="emoji-item">🎊</span>
+                        <span class="emoji-item">🎈</span><span class="emoji-item">🎁</span>
+                        <span class="emoji-item">🏆</span><span class="emoji-item">⭐</span>
+                        <span class="emoji-item">✨</span><span class="emoji-item">💫</span>
+                        <span class="emoji-item">💯</span><span class="emoji-item">🔥</span>
+                        <span class="emoji-item">👍</span><span class="emoji-item">👎</span>
+                        <span class="emoji-item">👏</span><span class="emoji-item">🙌</span>
+                        <span class="emoji-item">👋</span><span class="emoji-item">🤝</span>
+                        <span class="emoji-item">❤️</span><span class="emoji-item">💙</span>
+                        <span class="emoji-item">💚</span><span class="emoji-item">💛</span>
+                        <span class="emoji-item">🧡</span><span class="emoji-item">💜</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>
