@@ -629,8 +629,8 @@ body {
 /* Hand Raised Icon */
 .hand-raised-icon {
     position: absolute;
-    top: 5px;
-    left: 5px;
+    top: 60px;
+    right: 5px;
     font-size: 1.5rem;
     background: rgba(255, 152, 0, 0.9);
     padding: 5px 10px;
@@ -660,7 +660,7 @@ body {
 .reaction-emoji {
     position: absolute;
     font-size: 3rem;
-    animation: floatUp 3s ease-out forwards;
+    animation: floatUp 9s ease-out forwards;
 }
 
 @keyframes floatUp {
@@ -670,7 +670,7 @@ body {
     }
     100% {
         opacity: 0;
-        transform: translateY(-200px) scale(1.5);
+        transform: translateY(-800px) scale(1.5);
     }
 }
 
@@ -970,3 +970,4 @@ body {
 .video-effects-grayscale #local-video {
     filter: grayscale(100%);
 }
+
